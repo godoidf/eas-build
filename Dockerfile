@@ -1,10 +1,13 @@
-FROM ghcr.io/expo/expo-github-action:node
+FROM ghcr.io/expo/expo-github-action:latest
 
-RUN curl -s "https://get.sdkman.io" | bash && \
-    bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && sdk install kotlin 2.1.0 && sdk install gradle"
+ENV KOTLIN_VERSION=1.9.0
 
-ENV KOTLIN_VERSION=2.1.0
+RUN apt-get update && apt-get install -y curl unzip
 
-RUN kotlin -version && gradle -v && java -version
+RUN curl -L -o kotlin-compiler.zip https://github.com/JetBrains/kotlin/releases/download/v${KOTLIN_VERSION}/kotlin-compiler-${KOTLIN_VERSION}.zip && \
+    unzip kotlin-compiler.zip -d /opt && \
+    rm kotlin-compiler.zip && \
+    ln -s /opt/kotlinc/bin/kotlinc /usr/local/bin/kotlinc && \
+    ln -s /opt/kotlinc/bin/kotlin /usr/local/bin/kotlin
 
-WORKDIR /app
+RUN kotlin -version
